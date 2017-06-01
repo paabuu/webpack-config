@@ -3,11 +3,11 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: [
-        './src/main.js'
+        './client/src/main.js'
     ],
     output: {
         filename: 'bundle.js',
-        path: path.join(__dirname, 'build')
+        path: path.join(__dirname, 'client/build')
     },
     module: {
         rules: [

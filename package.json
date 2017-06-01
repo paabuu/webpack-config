@@ -5,8 +5,8 @@
   "main": "webpack.config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "export NODE_ENV=development && supervisor -w server,app.js app",
+    "start": "node server.js",
+    "dev": "export NODE_ENV=development && supervisor -w server,server.js server",
     "build": "webpack --config webpack.config.prod.js"
   },
   "author": "",
@@ -26,7 +26,10 @@
     "webpack-hot-middleware": "^2.18.0"
   },
   "dependencies": {
+    "axios": "^0.16.1",
+    "body-parser": "^1.17.2",
     "history": "^4.6.1",
+    "mongoose": "^4.10.4",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.5",
