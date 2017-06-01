@@ -36,7 +36,7 @@ exports.modify_todo_status = function(todo, callback) {
         if (err) {
             return;
         } else {
-            data.finished = !!todo.finished;
+            data.finished = !todo.finished;
             callback(data);
         }
     })

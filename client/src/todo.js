@@ -11,12 +11,16 @@ export default class Todo extends Component {
             newTodo: {
                 content: '',
                 finished: false
-            }
+            },
+            todoStatus: 'all'
         };
     }
 
     handleAddNewTodo() {
         let data = this.state.newTodo;
+
+        if (data.content.length === 0) return;
+
         axios({
             url: '/api/add_todo',
             method: 'post',
@@ -77,20 +81,52 @@ export default class Todo extends Component {
              })
     }
 
+    showUnfinishedTodo() {
+        this.setState({
+            todoStatus: 'unfinished'
+        });
+    }
+
+    showFinishedTodo() {
+        this.setState({
+            todoStatus: 'finished'
+        });
+    }
+
+    showAllTodo() {
+        this.setState({
+            todoStatus: 'all'
+        });
+    }
+
     render() {
 
-        const { newTodo, todoList } = this.state;
+        const { newTodo, todoList, todoStatus } = this.state;
         return (
             <div>
-                {
-                    todoList.map((item, index) => {
-                        return (
-                            <p key={ index } style={{ textDecoration: item.finished === true ? 'line-through' : 'none'}} onClick={ this.handleChangeStatus.bind(this, index)}>{ item.content }</p>
-                        )
-                    })
-                }
                 <input type="text" value={ newTodo.content } onChange={ this.handleTodoInput.bind(this) }/>
                 <button onClick={ this.handleAddNewTodo.bind(this) }>提交</button>
+                <button onClick={ this.showFinishedTodo.bind(this) }>已完成</button>
+                <button onClick={ this.showUnfinishedTodo.bind(this) }>未完成</button>
+                <button onClick={ this.showAllTodo.bind(this) }>全部</button>
+                {
+                    todoList.map((item, index) => {
+                        if (todoStatus === 'finished') {
+                            return (
+                                <p key={ index } style={{ textDecoration: item.finished === true ? 'line-through' : 'none', display: item.finished === true ? 'block' : 'none' }} onClick={ this.handleChangeStatus.bind(this, index)}>{ item.content }</p>
+                            )
+                        } else if (todoStatus === 'unfinished'){
+                            return (
+                                <p key={ index } style={{ textDecoration: item.finished === true ? 'line-through' : 'none', display: item.finished === true ? 'none' : 'block' }} onClick={ this.handleChangeStatus.bind(this, index)}>{ item.content }</p>
+                            )
+                        } else {
+                            return (
+                                <p key={ index } style={{ textDecoration: item.finished === true ? 'line-through' : 'none'}} onClick={ this.handleChangeStatus.bind(this, index)}>{ item.content }</p>
+                            )
+                        }
+                    })
+                }
+
             </div>
         )
     }
