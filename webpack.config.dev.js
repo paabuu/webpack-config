@@ -3,11 +3,11 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: [
-        './src/main.js',
+        './client/src/main.js',
         'webpack-hot-middleware/client?reload=true'
     ],
     output: {
-        path: path.resolve(__dirname, './output/'),
+        path: path.resolve(__dirname, './client/output/'),
         filename: 'bundle.js'
     },
     module: {
