@@ -3,6 +3,7 @@ var isDev = NODE_ENV === 'development';
 
 var express = require('express');
 var webpack = require('webpack');
+var open = require('open');
 
 var path = require('path');
 var app = express();
@@ -38,7 +39,7 @@ if (isDev) {
     reload(server, app);
 
     server.listen(8080, function() {
-        console.log('server is running on port 8080!')
+        console.log('server is running on port 8080!');
     });
 } else {
     app.use(express.static('client/build'));
@@ -48,6 +49,7 @@ if (isDev) {
     });
 
     app.listen(3000, function() {
-        console.log('server is running on port 8081!')
+        console.log('server is running on port 8081!');
+        open('http://127.0.0.1:3000');
     })
 }

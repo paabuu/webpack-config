@@ -51,25 +51,46 @@ export default class Todo extends Component {
 
     handleChangeStatus(index) {
         let { todoList } = this.state;
-        axios({
-            url: '/api/modify_todo_status',
-            method: 'post',
-            data: todoList[index],
-            contentType: 'application/json'
-        })
-        .then((res) => {
-            if (res.data.meta.code == 200) {
-                todoList[index].finished = !todoList[index].finished;
 
-                this.setState({
-                    newTodo: {
-                        content: '',
-                        finished: false
-                    },
-                    todoList
-                });
-            }
-        });
+        if (todoList[index].finished) {
+            axios({
+                url: '/api/remove_todo',
+                method: 'post',
+                data: todoList[index],
+                contentType: 'application/json'
+            })
+            .then((res) => {
+                if (res.data.meta.code == 200) {
+                    this.setState({
+                        newTodo: {
+                            content: '',
+                            finished: false
+                        },
+                        todoList: res.data.data
+                    });
+                }
+            })
+        } else {
+            axios({
+                url: '/api/finish_todo',
+                method: 'post',
+                data: todoList[index],
+                contentType: 'application/json'
+            })
+            .then((res) => {
+                if (res.data.meta.code == 200) {
+                    todoList[index].finished = !todoList[index].finished;
+
+                    this.setState({
+                        newTodo: {
+                            content: '',
+                            finished: false
+                        },
+                        todoList
+                    });
+                }
+            });
+        }
     }
 
     componentDidMount() {
@@ -102,6 +123,7 @@ export default class Todo extends Component {
     render() {
 
         const { newTodo, todoList, todoStatus } = this.state;
+
         return (
             <div>
                 <input type="text" value={ newTodo.content } onChange={ this.handleTodoInput.bind(this) }/>

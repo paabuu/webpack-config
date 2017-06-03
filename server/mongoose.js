@@ -1,5 +1,7 @@
 
 var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+
 var db = mongoose.connect('mongodb://127.0.0.1:27017/todo-list');
 
 var Todo = mongoose.model('todo',{
@@ -30,14 +32,25 @@ exports.todo_list = function(callback) {
     });
 };
 
-exports.modify_todo_status = function(todo, callback) {
-    console.log(!todo.finished)
-    Todo.findByIdAndUpdate(todo._id, { 'finished': !todo.finished }, function(err, data) {
+exports.finish_todo = function(todo, callback) {
+    Todo.findByIdAndUpdate(todo._id, { 'finished': true }, function(err, data) {
         if (err) {
             return;
         } else {
-            data.finished = !todo.finished;
+            data.finished = true;
             callback(data);
         }
     })
 };
+
+exports.remove_todo = function(todo_id, callback) {
+    Todo.remove({_id: todo_id}, function(err) {
+        if (err) {
+            console.log(err);
+        } else {
+            Todo.find({}, function(err, todo) {
+                callback(todo);
+            });
+        }
+    });
+}

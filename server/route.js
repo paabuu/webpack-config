@@ -19,8 +19,8 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/api/modify_todo_status', upload.array(), function(req, res) {
-        db.modify_todo_status(req.body, function(data) {
+    app.post('/api/finish_todo', upload.array(), function(req, res) {
+        db.finish_todo(req.body, function(data) {
             res.json({
                 meta: {
                     code: 200
@@ -34,5 +34,17 @@ module.exports = function(app) {
         db.todo_list(function(data) {
             res.send(data);
         })
+    });
+
+    app.post('/api/remove_todo', upload.array(), function(req, res) {
+        var todo_id = req.body;
+        db.remove_todo(todo_id, function(data) {
+            res.json({
+                meta: {
+                    code: 200
+                },
+                data: data
+            })
+        });
     });
 }
