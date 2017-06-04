@@ -35,10 +35,11 @@ exports.todo_list = function(callback) {
 exports.finish_todo = function(todo, callback) {
     Todo.findByIdAndUpdate(todo._id, { 'finished': true }, function(err, data) {
         if (err) {
+            console.log('finish todo error')
             return;
         } else {
-            data.finished = true;
-            callback(data);
+            console.log('success', data)
+            callback();
         }
     })
 };

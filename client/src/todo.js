@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import './todo_style.scss';
 
 export default class Todo extends Component {
 
@@ -34,7 +35,7 @@ export default class Todo extends Component {
                         content: '',
                         finished: false
                     },
-                    todoList: [...this.state.todoList, data]
+                    todoList: res.data.data
                 })
             }
         })

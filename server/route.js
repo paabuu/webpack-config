@@ -10,11 +10,12 @@ module.exports = function(app) {
     app.use(bodyParser.urlencoded({ extended: true })); //
 
     app.post('/api/add_todo', upload.array(), function(req, res) {
-        db.add_todo(req.body, function() {
+        db.add_todo(req.body, function(data) {
             res.json({
                 meta: {
                     code: 200
-                }
+                },
+                data: data
             })
         });
     });
