@@ -11,6 +11,8 @@ const history = createBrowserHistory();
 
 import Todo from './Todo';
 import Home from './Home';
+import Music from './Music';
+
 import './common.scss';
 
 
@@ -18,6 +20,7 @@ const App = () => (
     <Router history={ history }>
         <div>
             <Route path="/todo" component={ Todo }></Route>
+            <Route path="/music" component={ Music }></Route>
             <Route exact path="/" component={ Home }></Route>
         </div>
     </Router>

@@ -2,7 +2,8 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var multer = require('multer'); // v1.0.5
 var upload = multer(); // for parsing multipart/form-data
-
+const NeteaseMusic = require('simple-netease-cloud-music')
+const nm = new NeteaseMusic()
 var db = require('./mongoose');
 
 module.exports = function(app) {
@@ -47,5 +48,46 @@ module.exports = function(app) {
                 data: data
             })
         });
+    });
+
+    app.post('/api/get_music_list', upload.array(), function(req, res) {
+        var songName = req.body.name;
+
+        nm.search(songName).then(function(data) {
+            res.json({
+                meta: {
+                    code: 200
+                },
+                data: data
+            })
+        });
+
+    });
+    app.post('/api/get_music_list', upload.array(), function(req, res) {
+        var songName = req.body.name;
+
+        nm.search(songName).then(function(data) {
+            res.json({
+                meta: {
+                    code: 200
+                },
+                data: data
+            })
+        });
+
+    });
+
+    app.post('/api/get_music_url', upload.array(), function(req, res) {
+        var id = req.body.id;
+
+        nm.url(id).then(function(data) {
+            res.json({
+                meta: {
+                    code: 200
+                },
+                data: data
+            })
+        });
+
     });
 }

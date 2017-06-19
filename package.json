@@ -44,6 +44,7 @@
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
     "redux": "^3.6.0",
-    "sandpit": "^0.1.11"
+    "sandpit": "^0.1.11",
+    "simple-netease-cloud-music": "^0.1.8"
   }
 }

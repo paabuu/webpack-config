@@ -38,7 +38,7 @@ if (isDev) {
     var server = http.createServer(app);
     reload(server, app);
 
-    server.listen(8080, function() {
+    server.listen(8088, function() {
         console.log('server is running on port 8080!');
     });
 } else {
