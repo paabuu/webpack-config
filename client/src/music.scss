@@ -1,0 +1,43 @@
+.music-player {
+    width: 100%;
+    text-align: center;
+    margin-top: 200px;
+    .input, .search {
+        display: inline-block;
+        height: 30px;
+        width: 200px;
+    }
+    .playing {
+        color: skyblue;
+        font-size: 12px;
+        margin-top: 30px;
+    }
+}
+
+.song-info {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    &:hover {
+        background-color: #f5f5f5;
+    }
+    &:nth-of-type(1) {
+        margin-top: 30px;
+    }
+    .songName {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .author {
+        font-size: 14px;
+        color: #ccc;
+        margin-left: 20px;
+    }
+    .play {
+        font-size: 14px;
+        margin-left: 20px;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}
