@@ -53,20 +53,7 @@ module.exports = function(app) {
     app.post('/api/get_music_list', upload.array(), function(req, res) {
         var songName = req.body.name;
 
-        nm.search(songName).then(function(data) {
-            res.json({
-                meta: {
-                    code: 200
-                },
-                data: data
-            })
-        });
-
-    });
-    app.post('/api/get_music_list', upload.array(), function(req, res) {
-        var songName = req.body.name;
-
-        nm.search(songName).then(function(data) {
+        nm.search(songName, 1, 50).then(function(data) {
             res.json({
                 meta: {
                     code: 200

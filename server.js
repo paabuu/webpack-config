@@ -27,6 +27,7 @@ if (isDev) {
     app.use(webpackHotMiddleware(compiler));
 
     app.use(express.static('client/output'));
+    app.use(express.static('client/src'));
 
     var http = require('http');
     var reload = require('reload');
