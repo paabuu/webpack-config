@@ -1,43 +1,66 @@
 .music-player {
     width: 100%;
+    overflow: hidden;
+    padding-top: 100px;
     text-align: center;
     .input, .search {
-        display: inline-block;
+        display: block;
         height: 30px;
         width: 200px;
-    }
-    .playing {
-        color: skyblue;
-        font-size: 12px;
-        margin-top: 30px;
+        margin: 0 auto 100px;
     }
 }
 
+.lyric {
+    width: 0%;
+    height: 500px;
+    line-height: 2;
+    font-size: 14px;
+    padding: 30px 0;
+    overflow-y: scroll;
+    float: left;
+    &::-webkit-scrollbar {
+        display:none
+    }
+}
+
+.song-list {
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+    float: left;
+    font-size: 14px;
+}
 .song-info {
     width: 100%;
     text-align: center;
     line-height: 40px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
     &:hover {
         background-color: #f5f5f5;
     }
-    &:nth-of-type(1) {
-        margin-top: 30px;
-    }
-    .songName {
-        font-size: 18px;
-        font-weight: bold;
+    .song-name {
+        text-align: left;
+        font-size: 14px;
+        cursor: pointer;
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
     }
 
     .author {
-        font-size: 14px;
-        color: #ccc;
-        margin-left: 20px;
+        font-size: 12px;
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
+
     }
-    .play {
-        font-size: 14px;
-        margin-left: 20px;
-        cursor: pointer;
-        text-decoration: underline;
+    .song-time {
+        flex: 1;
+        font-size: 12px;
     }
 }
 
@@ -48,13 +71,23 @@
     bottom: 0;
     left: 0;
     background-color: #f5f5f5;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: space-around;
-    align-items: center;
-    .pre-play-next {
-        display: flex;
+    -ms-flex-pack: distribute;
         justify-content: space-around;
-        align-items: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    .pre-play-next {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-pack: distribute;
+            justify-content: space-around;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
         span {
             border-radius: 50%;
         }
@@ -87,8 +120,12 @@
     .song-info {
         width: 60%;
         height: 100%;
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
-        align-items: center;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
         .song-info-pic {
             width: 50px;
             height: 50px;
@@ -107,7 +144,8 @@
                 width: 80%;
                 height: 4px;
                 position: absolute;
-                transform: translateY(-50%);
+                -webkit-transform: translateY(-50%);
+                        transform: translateY(-50%);
                 top: 50%;
                 left: 10%;
             }
@@ -124,7 +162,8 @@
                 position: absolute;
                 left: 0;
                 top: 50%;
-                transform: translateY(-50%);
+                -webkit-transform: translateY(-50%);
+                        transform: translateY(-50%);
             }
             .total-time {
                 display: inline-block;
@@ -132,14 +171,20 @@
                 position: absolute;
                 right: 0;
                 top: 50%;
-                transform: translateY(-50%);
+                -webkit-transform: translateY(-50%);
+                        transform: translateY(-50%);
             }
         }
     }
     .setting {
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
-        align-items: center;
-        justify-content: space-around;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        -ms-flex-pack: distribute;
+            justify-content: space-around;
         span {
             display: block;
             width: 20px;
@@ -160,9 +205,14 @@
         }
     }
     .volume {
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
-        justify-content: space-around;
-        align-items: center;
+        -ms-flex-pack: distribute;
+            justify-content: space-around;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
         .volume-icon {
             width: 20px;
             height: 20px;

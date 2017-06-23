@@ -77,4 +77,25 @@ module.exports = function(app) {
         });
 
     });
+
+    app.post('/api/get_music_lyric', upload.array(), function(req, res) {
+        var id = req.body.id;
+        var newData = [];
+
+        nm.lyric(id).then(function(data) {
+
+            data.lrc.lyric.split('\n').forEach(function(item) {
+                newData.push({
+                    time: item.split(']')[0].slice(1),
+                    lyric: item.split(']')[1]
+                })
+            })
+            res.json({
+                meta: {
+                    code: 200
+                },
+                data: newData
+            })
+        });
+    });
 }

@@ -12,10 +12,22 @@ export default class Music extends Component {
             playing: '',
             thePresentSongIndex: 0,
             playTime: 0,
-            onPlay: false
+            onPlay: false,
+            lyric: [],
+            preTime: '00:00'
         }
     }
     componentDidMount() {
+        console.log(this.refs.lyric.scrollTop);
+    }
+
+    componentWillUpdate() {
+        if (this.state.musicList.length > 0) {
+            const allTime = this.state.musicList[this.state.thePresentSongIndex].dt;
+            const { playTime } = this.state;
+
+            this.refs.lyric.scrollTop = playTime / allTime * this.refs.lyric.scrollHeight - 50
+        }
     }
 
     handleInputSong(e) {
@@ -53,7 +65,6 @@ export default class Music extends Component {
                     musicName: '',
                     thePresentSongIndex: 0
                 })
-                console.log(this.state.musicList)
             }
         })
     }
@@ -103,6 +114,20 @@ export default class Music extends Component {
                 playTime: 0
             });
             this.state.audio.play();
+        });
+
+        axios({
+            url: '/api/get_music_lyric',
+            method: 'post',
+            data: {
+                id
+            },
+            contentType: 'application/json'
+        })
+        .then(res => {
+            this.setState({
+                lyric: res.data.data
+            })
         })
     }
 
@@ -118,7 +143,7 @@ export default class Music extends Component {
     }
 
     transformTime(time) {
-        const min = parseInt(time / 1000 / 60);
+        const min = parseInt(time / 1000 / 60) < 10 ? '0' + parseInt(time / 1000 / 60) : parseInt(time / 1000 / 60);
         const sec = parseInt(time / 1000) % 60 < 10 ? '0' + parseInt(time / 1000) % 60 : parseInt(time / 1000) % 60;
 
         return `${min}:${sec}`
@@ -154,19 +179,36 @@ export default class Music extends Component {
         }
     }
 
+    compareTime(time, arr, index) {
+        var playTime = this.transformTime(this.state.playTime);
+        if(playTime >= time && (index < arr.length -1) && playTime < (arr[index + 1]).time ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     render() {
         const nowPlayMusic = this.state.musicList[this.state.thePresentSongIndex];
-        console.log(this.state.playTime)
         return (
             <div className="music-player">
-                <input type="text" className="input" placeholder="输入音乐名称" onChange={ this.handleInputSong.bind(this) } onKeyDown={ this.handleKeyDown.bind(this)} value={ this.state.musicName }/>
+                <input type="text" className="input" placeholder="" onChange={ this.handleInputSong.bind(this) } onKeyDown={ this.handleKeyDown.bind(this)} value={ this.state.musicName }/>
                 {/*<button className="search" onClick={ this.searchMusic.bind(this) }>搜索</button>*/}
-                <span className="playing" style={{ display: this.state.playing === '' ? 'none' : 'block' }}>正在播放: { this.state.playing }</span>
+                <div className="lyric" ref="lyric" style={{ width: !this.state.audio ? '0%' : '50%' }}>
+                    {
+                        this.state.lyric.map((item, index, arr) => {
+                            return (
+                                <p key={ index } style={{ color: this.compareTime(item.time, arr, index) ? 'red' : '#000'}} >{ item.lyric }</p>
+                            )
+                        })
+                    }
+                </div>
+                <div className="song-list" style={{ width: !this.state.audio ? '100%' : '50%' }}>
                 {
                     this.state.musicList.map((item, index) => {
                         return (
                             <p key={ index } className="song-info" style={{ backgroundColor: this.state.thePresentSongIndex == index ? '#f5f5f5' : '' }}>
-                                <span className="song-name">{ item.name }</span>
+                                <span className="song-name" onClick={ this.handlePlayMusic.bind(this, item.id, item.name, index) }>{ item.name }</span>
                                 <span className="author">
                                     { item.ar.map((i, order) => {
                                         return (
@@ -174,12 +216,13 @@ export default class Music extends Component {
                                         )
                                     })}
                                 </span>
-                                <span className="play" onClick={ this.handlePlayMusic.bind(this, item.id, item.name, index) }>play</span>
+                                <span className="song-time">{ this.transformTime(item.dt) }</span>
                             </p>
                         )
                     })
                 }
-                <div className="bottom-player">
+                </div>
+                <div className="bottom-player" style={{ opacity: !this.state.audio ? '0' : '1'}}>
                     <div className="pre-play-next">
                         <span className="pre-song"></span>
                         <span className={ this.state.onPlay === false ? 'on-play play-pause ' : 'on-pause play-pause ' } onClick={ this.handlePlayPause.bind(this) }></span>
