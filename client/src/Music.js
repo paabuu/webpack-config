@@ -142,6 +142,13 @@ export default class Music extends Component {
         this.handlePlayMusic(nextSong.id, nextSong.name, this.state.thePresentSongIndex + 1);
     }
 
+    handlePreSong() {
+        if (this.state.thePresentSongIndex === 0) return;
+
+        var preSong = this.state.musicList[this.state.thePresentSongIndex - 1];
+        this.handlePlayMusic(preSong.id, preSong.name, this.state.thePresentSongIndex -1);
+    }
+
     transformTime(time) {
         const min = parseInt(time / 1000 / 60) < 10 ? '0' + parseInt(time / 1000 / 60) : parseInt(time / 1000 / 60);
         const sec = parseInt(time / 1000) % 60 < 10 ? '0' + parseInt(time / 1000) % 60 : parseInt(time / 1000) % 60;
@@ -224,9 +231,9 @@ export default class Music extends Component {
                 </div>
                 <div className="bottom-player" style={{ opacity: !this.state.audio ? '0' : '1'}}>
                     <div className="pre-play-next">
-                        <span className="pre-song"></span>
+                        <span className="pre-song" onClick={ this.handlePreSong.bind(this) }></span>
                         <span className={ this.state.onPlay === false ? 'on-play play-pause ' : 'on-pause play-pause ' } onClick={ this.handlePlayPause.bind(this) }></span>
-                        <span className="next-song"></span>
+                        <span className="next-song" onClick={ this.handleNextSong.bind(this) }></span>
                     </div>
                     <div className="song-info">
                         <div className="song-info-pic">

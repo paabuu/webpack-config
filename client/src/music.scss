@@ -19,6 +19,7 @@
     padding: 30px 0;
     overflow-y: scroll;
     float: left;
+    transition: width ease .5s;
     &::-webkit-scrollbar {
         display:none
     }
@@ -31,6 +32,7 @@
     overflow: hidden;
     float: left;
     font-size: 14px;
+    transition: width ease .5s;
 }
 .song-info {
     width: 100%;
@@ -92,29 +94,45 @@
             border-radius: 50%;
         }
         .pre-song, .next-song {
+            border: 1px solid #ccc;
             width: 30px;
             height: 30px;
+            cursor: pointer;
         }
         .pre-song {
             background: url('/assets/pre.png') center center no-repeat;
-            background-size: contain;
+            background-size: 20px 20px;
+            &:hover {
+                background-image: url('/assets/pre1.png');
+            }
         }
         .next-song {
             background: url('/assets/next.png') center center no-repeat;
-            background-size: contain;
+            background-size: 20px 20px;
+            &:hover {
+                background-image: url('/assets/next1.png');
+            }
         }
         .play-pause {
+            border: 1px solid #ccc;
             width: 40px;
             height: 40px;
-            margin: 0 15px;
+            margin: 0 20px;
+            cursor: pointer;
         }
         .on-play {
             background: url('/assets/play.png') center center no-repeat;
-            background-size: contain;
+            background-size: 25px 25px;
+            &:hover {
+                background-image: url('/assets/play1.png');
+            }
         }
         .on-pause {
             background: url('/assets/pause.png') center center no-repeat;
-            background-size: contain;
+            background-size: 25px 25px;
+            &:hover {
+                background-image: url('/assets/pause1.png');
+            }
         }
     }
     .song-info {
