@@ -9,6 +9,11 @@ var Todo = mongoose.model('todo',{
     finished: Boolean
 });
 
+var User = mongoose.model('user', {
+    username: String,
+    password: String
+});
+
 exports.add_todo = function(data,callback) {
     var todo = new Todo({
         content: data.content,
@@ -54,4 +59,40 @@ exports.remove_todo = function(todo_id, callback) {
             });
         }
     });
+};
+
+exports.regist = function(info, callback) {
+    var user = new User({
+        username: info.username,
+        password: info.password
+    });
+
+    user.save(function(err) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        callback();
+    })
+};
+
+exports.login = function(info, callback, fallback) {
+
+    User.find({ username: info.username }, function(err, users) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        var lock = true;
+        users.forEach(function(item, index) {
+            if (item.password = info.password) {
+                callback();
+                lock = false;
+            }
+        });
+
+        if (lock) fallback('error')
+    })
 }

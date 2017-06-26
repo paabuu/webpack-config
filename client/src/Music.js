@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import cookie from 'react-cookies';
+
 import './music.scss';
+import Login from './Login';
 
 export default class Music extends Component {
     constructor() {
@@ -14,7 +17,9 @@ export default class Music extends Component {
             playTime: 0,
             onPlay: false,
             lyric: [],
-            preTime: '00:00'
+            preTime: '00:00',
+            showLogin: false,
+            loop: true
         }
     }
     componentDidMount() {
@@ -138,8 +143,13 @@ export default class Music extends Component {
             })
         }
 
-        var nextSong = this.state.musicList[this.state.thePresentSongIndex + 1];
-        this.handlePlayMusic(nextSong.id, nextSong.name, this.state.thePresentSongIndex + 1);
+        if (this.state.loop) {
+            var nextSong = this.state.musicList[this.state.thePresentSongIndex + 1];
+            this.handlePlayMusic(nextSong.id, nextSong.name, this.state.thePresentSongIndex + 1);
+        } else {
+            var nextSong = this.state.musicList[this.state.thePresentSongIndex];
+            this.handlePlayMusic(nextSong.id, nextSong.name, this.state.thePresentSongIndex);
+        }
     }
 
     handlePreSong() {
@@ -195,67 +205,92 @@ export default class Music extends Component {
         }
     }
 
+    handleLikeSong() {
+        if (!cookie.load('pabu-username')) {
+            this.setState({
+                showLogin: true
+            })
+        } else {
+            console.log('已登录!')
+        }
+    }
+
+    handleCloseLogin() {
+        this.setState({
+            showLogin: false
+        })
+    }
+
+    handlePlayPattern() {
+        this.setState({
+            loop: !this.state.loop
+        })
+    }
+
     render() {
         const nowPlayMusic = this.state.musicList[this.state.thePresentSongIndex];
         return (
-            <div className="music-player">
-                <input type="text" className="input" placeholder="" onChange={ this.handleInputSong.bind(this) } onKeyDown={ this.handleKeyDown.bind(this)} value={ this.state.musicName }/>
-                {/*<button className="search" onClick={ this.searchMusic.bind(this) }>搜索</button>*/}
-                <div className="lyric" ref="lyric" style={{ width: !this.state.audio ? '0%' : '50%' }}>
+            <div>
+                <div className="music-player">
+                    <input type="text" className="input" placeholder="" onChange={ this.handleInputSong.bind(this) } onKeyDown={ this.handleKeyDown.bind(this)} value={ this.state.musicName }/>
+                    {/*<button className="search" onClick={ this.searchMusic.bind(this) }>搜索</button>*/}
+                    <div className="lyric" ref="lyric" style={{ width: !this.state.audio ? '0%' : '50%' }}>
+                        {
+                            this.state.lyric.map((item, index, arr) => {
+                                return (
+                                    <p key={ index } style={{ color: this.compareTime(item.time, arr, index) ? 'red' : '#000'}} >{ item.lyric }</p>
+                                )
+                            })
+                        }
+                    </div>
+                    <div className="song-list" style={{ width: !this.state.audio ? '100%' : '50%' }}>
                     {
-                        this.state.lyric.map((item, index, arr) => {
+                        this.state.musicList.map((item, index) => {
                             return (
-                                <p key={ index } style={{ color: this.compareTime(item.time, arr, index) ? 'red' : '#000'}} >{ item.lyric }</p>
+                                <p key={ index } className="song-info" style={{ backgroundColor: this.state.thePresentSongIndex == index ? '#f5f5f5' : '' }}>
+                                    <span className="song-name" onClick={ this.handlePlayMusic.bind(this, item.id, item.name, index) }>{ item.name }</span>
+                                    <span className="author">
+                                        { item.ar.map((i, order) => {
+                                            return (
+                                                i.name
+                                            )
+                                        })}
+                                    </span>
+                                    <span className="song-time">{ this.transformTime(item.dt) }</span>
+                                </p>
                             )
                         })
                     }
-                </div>
-                <div className="song-list" style={{ width: !this.state.audio ? '100%' : '50%' }}>
-                {
-                    this.state.musicList.map((item, index) => {
-                        return (
-                            <p key={ index } className="song-info" style={{ backgroundColor: this.state.thePresentSongIndex == index ? '#f5f5f5' : '' }}>
-                                <span className="song-name" onClick={ this.handlePlayMusic.bind(this, item.id, item.name, index) }>{ item.name }</span>
-                                <span className="author">
-                                    { item.ar.map((i, order) => {
-                                        return (
-                                            i.name
-                                        )
-                                    })}
-                                </span>
-                                <span className="song-time">{ this.transformTime(item.dt) }</span>
-                            </p>
-                        )
-                    })
-                }
-                </div>
-                <div className="bottom-player" style={{ opacity: !this.state.audio ? '0' : '1'}}>
-                    <div className="pre-play-next">
-                        <span className="pre-song" onClick={ this.handlePreSong.bind(this) }></span>
-                        <span className={ this.state.onPlay === false ? 'on-play play-pause ' : 'on-pause play-pause ' } onClick={ this.handlePlayPause.bind(this) }></span>
-                        <span className="next-song" onClick={ this.handleNextSong.bind(this) }></span>
                     </div>
-                    <div className="song-info">
-                        <div className="song-info-pic">
-                            <img src={ this.state.musicList[this.state.thePresentSongIndex] && this.state.musicList[this.state.thePresentSongIndex].al.picUrl } alt=""/>
+                    <div className="bottom-player" style={{ opacity: !this.state.audio ? '0' : '1'}}>
+                        <div className="pre-play-next">
+                            <span className="pre-song" onClick={ this.handlePreSong.bind(this) }></span>
+                            <span className={ this.state.onPlay === false ? 'on-play play-pause ' : 'on-pause play-pause ' } onClick={ this.handlePlayPause.bind(this) }></span>
+                            <span className="next-song" onClick={ this.handleNextSong.bind(this) }></span>
                         </div>
-                        <div className="song-progress">
-                            <span className="start-time">{ this.transformTime(this.state.playTime) }</span>
-                            <span className="progress-bar-total progress-bar"></span>
-                            <span className="progress-bar-new progress-bar" style={{ width: nowPlayMusic ? `${ this.state.playTime / nowPlayMusic.dt * 100 * .8 }%` : '0' }}></span>
-                            <span className="total-time">{ nowPlayMusic && this.transformTime(nowPlayMusic.dt) }</span>
+                        <div className="song-info">
+                            <div className="song-info-pic">
+                                <img src={ this.state.musicList[this.state.thePresentSongIndex] && this.state.musicList[this.state.thePresentSongIndex].al.picUrl } alt=""/>
+                            </div>
+                            <div className="song-progress">
+                                <span className="start-time">{ this.transformTime(this.state.playTime) }</span>
+                                <span className="progress-bar-total progress-bar"></span>
+                                <span className="progress-bar-new progress-bar" style={{ width: nowPlayMusic ? `${ this.state.playTime / nowPlayMusic.dt * 100 * .8 }%` : '0' }}></span>
+                                <span className="total-time">{ nowPlayMusic && this.transformTime(nowPlayMusic.dt) }</span>
+                            </div>
+                        </div>
+                        <div className="setting">
+                            <span className="play-pattern"></span>
+                            <span className="like" onClick={ this.handleLikeSong.bind(this)}></span>
+                            <span className={ this.state.loop === true ? 'loop' : 'single-circle' } onClick={ this.handlePlayPattern.bind(this) }></span>
+                        </div>
+                        <div className="volume">
+                            <span className="volume-icon"></span>
+                            <span className="volume-percentage"></span>
                         </div>
                     </div>
-                    <div className="setting">
-                        <span className="play-pattern"></span>
-                        <span className="like"></span>
-                        <span className="delete"></span>
-                    </div>
-                    <div className="volume">
-                        <span className="volume-icon"></span>
-                        <span className="volume-percentage"></span>
-                    </div>
                 </div>
+                <Login show={ this.state.showLogin } close={ this.handleCloseLogin.bind(this) }></Login>
             </div>
         )
     }

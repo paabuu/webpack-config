@@ -98,4 +98,37 @@ module.exports = function(app) {
             })
         });
     });
+
+    app.post('/api/regist', upload.array(), function(req, res) {
+
+        db.regist({
+            username: req.body.username,
+            password: req.body.password
+        }, function() {
+            res.json({
+                meta: {
+                    code: 200
+                }
+            })
+        })
+    });
+
+    app.post('/api/login', upload.array(), function(req, res) {
+        db.login({
+            username: req.body.username,
+            password: req.body.password
+        }, function() {
+            res.json({
+                meta: {
+                    code: 200
+                }
+            })
+        }, function() {
+            res.json({
+                meta: {
+                    code: 400
+                }
+            })
+        })
+    });
 }
