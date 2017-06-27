@@ -8,7 +8,6 @@ var open = require('open');
 var path = require('path');
 var app = express();
 var route = require('./server/route');
-
 route(app);
 
 if (isDev) {

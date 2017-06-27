@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import cookie from 'react-cookies';
 
 export default class Regist extends Component {
     constructor(props) {
@@ -37,13 +38,17 @@ export default class Regist extends Component {
             contentType: 'application/json'
         })
         .then((res) => {
-            this.setState({
-                username: '',
-                password1: '',
-                password2: ''
-            });
-
-            location.href = '/music'
+            if (res.data.meta.code === 200) {
+                this.setState({
+                    username: '',
+                    password1: '',
+                    password2: ''
+                });
+                cookie.save('pabu_username', username);
+                location.href = '/music'
+            } else {
+                alert('用户名已存在!')
+            }
         })
     }
 

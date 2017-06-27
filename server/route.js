@@ -1,5 +1,6 @@
 var path = require('path');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var multer = require('multer'); // v1.0.5
 var upload = multer(); // for parsing multipart/form-data
 const NeteaseMusic = require('simple-netease-cloud-music')
@@ -9,6 +10,7 @@ var db = require('./mongoose');
 module.exports = function(app) {
     app.use(bodyParser.json()); // for parsing application/json
     app.use(bodyParser.urlencoded({ extended: true })); //
+    app.use(cookieParser());
 
     app.post('/api/add_todo', upload.array(), function(req, res) {
         db.add_todo(req.body, function(data) {
@@ -100,7 +102,6 @@ module.exports = function(app) {
     });
 
     app.post('/api/regist', upload.array(), function(req, res) {
-
         db.regist({
             username: req.body.username,
             password: req.body.password
@@ -108,6 +109,12 @@ module.exports = function(app) {
             res.json({
                 meta: {
                     code: 200
+                }
+            })
+        }, function() {
+            res.json({
+                meta: {
+                    code: 400
                 }
             })
         })
@@ -130,5 +137,34 @@ module.exports = function(app) {
                 }
             })
         })
+    });
+
+    app.post('/api/add_collections', upload.array(), function(req, res) {
+        console.log(req.cookies);
+        console.log(req.body);
+        db.add_collections(req.cookies, req.body, function() {
+            res.json({
+                meta: {
+                    code: 200
+                }
+            })
+        }, function() {
+            res.json({
+                meta: {
+                    code: 400
+                }
+            })
+        })
+    });
+
+    app.get('/api/get_collections', function(req, res) {
+        db.get_collections(req.cookies, function(collections) {
+            res.json({
+                meta: {
+                    code: 200
+                },
+                data: collections
+            })
+        });
     });
 }

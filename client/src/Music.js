@@ -19,11 +19,27 @@ export default class Music extends Component {
             lyric: [],
             preTime: '00:00',
             showLogin: false,
-            loop: true
+            loop: true,
+            collections: [],
+            showCollections: false,
+            searchSongName: ''
         }
     }
     componentDidMount() {
         console.log(this.refs.lyric.scrollTop);
+        this.updateCollections();
+    }
+
+    updateCollections() {
+        axios({
+            url: '/api/get_collections',
+            method: 'get'
+        })
+        .then(res => {
+            this.setState({
+                collections: res.data.data
+            })
+        })
     }
 
     componentWillUpdate() {
@@ -44,6 +60,9 @@ export default class Music extends Component {
     handleKeyDown(e) {
         if(e.keyCode === 13) {
             this.searchMusic();
+            this.setState({
+                searchSongName: this.state.musicName
+            })
         }
     }
 
@@ -205,13 +224,47 @@ export default class Music extends Component {
         }
     }
 
-    handleLikeSong() {
-        if (!cookie.load('pabu-username')) {
+    handleLikeSong(isLiked, index) {
+        if (this.state.playing === '') return;
+        if (!cookie.load('pabu_username')) {
             this.setState({
                 showLogin: true
             })
         } else {
-            console.log('已登录!')
+            console.log('已登录!');
+            const theSong = this.state.musicList[this.state.thePresentSongIndex];
+            const data = {
+                id: theSong.id,
+                name: theSong.name,
+                dt: theSong.dt,
+                ar: theSong.ar,
+                isLiked
+            };
+
+            axios({
+                url: '/api/add_collections',
+                method: 'post',
+                data,
+                contentType: 'application/json'
+            })
+            .then(res => {
+                if (res.data.meta.code === 200) {
+                    console.log('liked');
+                    if (isLiked) {
+                        this.state.collections.splice(index, 1);
+                        this.setState({
+                            collections: this.state.collections
+                        })
+                    } else {
+                        this.setState({
+                            collections: [
+                                ...this.state.collections,
+                                data
+                            ]
+                        })
+                    }
+                }
+            })
         }
     }
 
@@ -227,8 +280,32 @@ export default class Music extends Component {
         })
     }
 
+    handleShowCollections() {
+        if (!cookie.load('pabu_username')) {
+            this.setState({
+                showLogin: true
+            })
+        } else {
+            this.setState({
+                showCollections: !this.state.showCollections
+            })
+        }
+    }
     render() {
         const nowPlayMusic = this.state.musicList[this.state.thePresentSongIndex];
+        let isLiked = false;
+        let likedIndex = -1;
+        if (this.state.collections.length > 0 && nowPlayMusic) {
+            this.state.collections.forEach((item, index) => {
+                if (item.id === nowPlayMusic.id) {
+                    isLiked = true;
+                    likedIndex = index;
+                }
+            })
+        }
+
+        const showList = !this.state.showCollections ? this.state.musicList : this.state.collections;
+        const { searchSongName } = this.state;
         return (
             <div>
                 <div className="music-player">
@@ -243,24 +320,33 @@ export default class Music extends Component {
                             })
                         }
                     </div>
-                    <div className="song-list" style={{ width: !this.state.audio ? '100%' : '50%' }}>
-                    {
-                        this.state.musicList.map((item, index) => {
-                            return (
-                                <p key={ index } className="song-info" style={{ backgroundColor: this.state.thePresentSongIndex == index ? '#f5f5f5' : '' }}>
-                                    <span className="song-name" onClick={ this.handlePlayMusic.bind(this, item.id, item.name, index) }>{ item.name }</span>
-                                    <span className="author">
-                                        { item.ar.map((i, order) => {
-                                            return (
-                                                i.name
-                                            )
-                                        })}
-                                    </span>
-                                    <span className="song-time">{ this.transformTime(item.dt) }</span>
-                                </p>
-                            )
-                        })
-                    }
+                    <div className="song-list" style={{ width: !this.state.audio ? '100%' : '50%', display: this.state.musicList.length > 0 ? 'block' : 'none' }}>
+
+                        <p className="song-info">
+                            { this.state.showCollections ? '你喜欢的歌曲列表' : `${ searchSongName } 搜索结果:` }
+                        </p>
+                        <p className="song-info" style={{ fontWeight: 'bold'}}>
+                            <span className="song-name">歌曲标题</span>
+                            <span className="author">歌手</span>
+                            <span className="song-time">时长</span>
+                        </p>
+                        {
+                            showList.map((item, index) => {
+                                return (
+                                    <p key={ index } className="song-info" style={{ backgroundColor: this.state.thePresentSongIndex == index ? '#f5f5f5' : '' }}>
+                                        <span className="song-name" onClick={ this.handlePlayMusic.bind(this, item.id, item.name, index) }>{ item.name }</span>
+                                        <span className="author">
+                                            { item.ar.map((i, order) => {
+                                                return (
+                                                    i.name
+                                                )
+                                            })}
+                                        </span>
+                                        <span className="song-time">{ this.transformTime(item.dt) }</span>
+                                    </p>
+                                )
+                            })
+                        }
                     </div>
                     <div className="bottom-player" style={{ opacity: !this.state.audio ? '0' : '1'}}>
                         <div className="pre-play-next">
@@ -280,8 +366,8 @@ export default class Music extends Component {
                             </div>
                         </div>
                         <div className="setting">
-                            <span className="play-pattern"></span>
-                            <span className="like" onClick={ this.handleLikeSong.bind(this)}></span>
+                            <span className={ this.state.showCollections ? 'show-collections' : 'hide-collections' } onClick={ this.handleShowCollections.bind(this) }></span>
+                            <span className={ isLiked ? 'like' : 'dislike'} onClick={ this.handleLikeSong.bind(this, isLiked, likedIndex)}></span>
                             <span className={ this.state.loop === true ? 'loop' : 'single-circle' } onClick={ this.handlePlayPattern.bind(this) }></span>
                         </div>
                         <div className="volume">
@@ -290,7 +376,31 @@ export default class Music extends Component {
                         </div>
                     </div>
                 </div>
-                <Login show={ this.state.showLogin } close={ this.handleCloseLogin.bind(this) }></Login>
+                <Login show={ this.state.showLogin } close={ this.handleCloseLogin.bind(this) } updateCollections={ this.updateCollections.bind(this) }></Login>
+                { /*<div className="collections-list">
+                    <p className="each-collection header">
+                        <span className="song-name">音乐标题</span>
+                        <span className="author">歌手</span>
+                        <span className="song-time">时长</span>
+                    </p>
+                    {
+                        this.state.collections.map((item, index) => {
+                            return (
+                                <p className="each-collection">
+                                    <span className="song-name">{ item.name }</span>
+                                    <span className="author">
+                                        { item.ar.map((i, order) => {
+                                            return (
+                                                i.name
+                                            )
+                                        })}
+                                    </span>
+                                    <span className="song-time">{ this.transformTime(item.dt) }</span>
+                                </p>
+                            )
+                        })
+                    }
+                </div>*/ }
             </div>
         )
     }

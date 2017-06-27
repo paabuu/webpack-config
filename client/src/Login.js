@@ -35,11 +35,12 @@ export default class Login extends Component {
 
             if (res.data.meta.code === 200 ) {
 
-                cookie.save('pabu-username', username);
+                cookie.save('pabu_username', username);
                 this.setState({
                     username: '',
                     password: ''
                 });
+                this.props.updateCollections();
                 this.props.close();
             } else {
                 alert('用户名不存在或密码错误!')
@@ -68,6 +69,7 @@ export default class Login extends Component {
                         <span className="password"></span>
                         <input type="password" value={ password } onKeyDown={ this.handleKeyDown.bind(this) } onChange={ this.handleLoginInput.bind(this, 'password')} />
                     </div>
+                    <a href="/regist" className="regist">sign up</a>
                 </div>
             </div>
         )

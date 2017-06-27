@@ -11,7 +11,8 @@ var Todo = mongoose.model('todo',{
 
 var User = mongoose.model('user', {
     username: String,
-    password: String
+    password: String,
+    collections: Array
 });
 
 exports.add_todo = function(data,callback) {
@@ -61,20 +62,28 @@ exports.remove_todo = function(todo_id, callback) {
     });
 };
 
-exports.regist = function(info, callback) {
+exports.regist = function(info, callback, fallback) {
     var user = new User({
         username: info.username,
         password: info.password
     });
 
-    user.save(function(err) {
-        if (err) {
-            console.log(err);
-            return;
-        }
+    User.find({ username: info.username }, function(err, users) {
+        if (users.length === 0) {
+            user.save(function(err) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
 
-        callback();
+                callback();
+            })
+        } else {
+            fallback()
+        }
     })
+
+
 };
 
 exports.login = function(info, callback, fallback) {
@@ -95,4 +104,49 @@ exports.login = function(info, callback, fallback) {
 
         if (lock) fallback('error')
     })
+}
+
+exports.add_collections = function(info, data, callback, fallback) {
+
+    if (data.isLiked) {
+        User.update(
+            { username: info.pabu_username},
+            { $pull: {
+                collections: {
+                    id: data.id
+                }
+            }},
+            function(err) {
+                callback()
+            }
+        )
+    } else {
+        User.update(
+            { username: info.pabu_username },
+            { $push: {
+                collections: {
+                    $each: [
+                        {
+                            id: data.id,
+                            name: data.name,
+                            dt: data.dt,
+                            ar: data.ar
+                        }
+                    ]
+                }
+            }},
+            function(err, users) {
+                callback();
+        })
+    }
+}
+
+exports.get_collections = function(info, callback) {
+    User.find({ username: info.pabu_username}, function(err, users) {
+        if (users.length == 0) {
+            callback([]);
+        } else {
+            callback(users[0].collections)
+        }
+    });
 }
