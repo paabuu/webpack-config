@@ -21,9 +21,8 @@ const App = () => (
     <Router history={ history }>
         <div>
             <Route path="/todo" component={ Todo }></Route>
-            <Route path="/music" component={ Music }></Route>
             <Route path="/regist" component={ Regist }></Route>
-            <Route exact path="/" component={ Home }></Route>
+            <Route exact path="/" component={ Music }></Route>
         </div>
     </Router>
 );
