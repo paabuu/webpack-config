@@ -107,7 +107,7 @@ export default class Music extends Component {
         })
         .then((res) => {
             if(this.state.audio) this.state.audio.pause();
-            const audio = new Audio(res.data.data.data[0].url);
+            const audio = new Audio(res.data.data.url);
             // audio.loop = true;
             audio.addEventListener('ended', () => {
                 this.handleNextSong();
@@ -292,7 +292,9 @@ export default class Music extends Component {
         }
     }
     render() {
-        const nowPlayMusic = this.state.musicList[this.state.thePresentSongIndex];
+        const showList = !this.state.showCollections ? this.state.musicList : this.state.collections;
+        const nowPlayMusic = showList[this.state.thePresentSongIndex];
+
         let isLiked = false;
         let likedIndex = -1;
         if (this.state.collections.length > 0 && nowPlayMusic) {
@@ -304,7 +306,7 @@ export default class Music extends Component {
             })
         }
 
-        const showList = !this.state.showCollections ? this.state.musicList : this.state.collections;
+        // const showList = !this.state.showCollections ? this.state.musicList : this.state.collections;
         const { searchSongName } = this.state;
         return (
             <div>
@@ -370,10 +372,11 @@ export default class Music extends Component {
                             <span className={ isLiked ? 'like' : 'dislike'} onClick={ this.handleLikeSong.bind(this, isLiked, likedIndex)}></span>
                             <span className={ this.state.loop === true ? 'loop' : 'single-circle' } onClick={ this.handlePlayPattern.bind(this) }></span>
                         </div>
-                        <div className="volume">
+                        {/*<div className="volume">
                             <span className="volume-icon"></span>
                             <span className="volume-percentage"></span>
                         </div>
+                        */}
                     </div>
                 </div>
                 <Login show={ this.state.showLogin } close={ this.handleCloseLogin.bind(this) } updateCollections={ this.updateCollections.bind(this) }></Login>

@@ -1,10 +1,14 @@
 var path = require('path');
+var fs = require('fs');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var multer = require('multer'); // v1.0.5
 var upload = multer(); // for parsing multipart/form-data
+var request = require('request');
+
 const NeteaseMusic = require('simple-netease-cloud-music')
 const nm = new NeteaseMusic()
+
 var db = require('./mongoose');
 
 module.exports = function(app) {
@@ -70,14 +74,36 @@ module.exports = function(app) {
         var id = req.body.id;
 
         nm.url(id).then(function(data) {
-            res.json({
-                meta: {
-                    code: 200
-                },
-                data: data
+            const mp3Path = path.resolve('mp3', `${id}.mp3`);
+
+            fs.exists(mp3Path, (exists) => {
+                console.log(exists);
+                if (exists) {
+                    res.json({
+                        meta: {
+                            code: 200
+                        },
+                        data: {
+                            url: `http://music.ipabu.com/mp3/${id}.mp3`
+                        }
+                    });
+                } else {
+                    const writable = fs.createWriteStream(path.resolve('mp3', `${id}.mp3`));
+                    request(data.data[0].url).pipe(writable);
+
+                    setTimeout(() => {
+                        res.json({
+                            meta: {
+                                code: 200
+                            },
+                            data: {
+                                url: `http://music.ipabu.com/mp3/${id}.mp3`
+                            }
+                        });
+                    }, 1000);
+                }
             })
         });
-
     });
 
     app.post('/api/get_music_lyric', upload.array(), function(req, res) {
